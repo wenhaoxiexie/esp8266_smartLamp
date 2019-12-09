@@ -226,6 +226,7 @@ static void Factory_Reset(void)
 	lightInfo.autoLight=false;
 	lightInfo.timeMode=TIME_MODE_NULL;
 	lightInfo.lightness=125;
+	autoButton =false;
 	myNVS_write(lightInfo);
 	
 
