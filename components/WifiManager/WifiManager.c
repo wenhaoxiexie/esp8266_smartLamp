@@ -12,8 +12,10 @@
 
 
 #define TAG		"WifiManager"
-//#define WIFI_SSID	" " //"MERCURY_30FF5E"
-//#define WIFI_PASS	" " //"smart-home"
+#define FACTORY_SSID "wifitest4M"
+#define FACTORY_PASS "11111111"
+#define WIFI_SSID	"MERCURY_30FF5E" 
+#define WIFI_PASS	"smart-home" 
 #define SMARTCONFIG_TIMEOUT_TICK   (60000 / portTICK_RATE_MS)
 #define WIFI_MANAGER_SETTING        BIT0
 #define WIFI_MANAGER_DISCONNECT     BIT1
@@ -75,6 +77,44 @@ static esp_err_t wifiEvtHandlerCb(void* ctx, system_event_t* evt)
 			wifi_led_control(LED_OFF);
             break;
        	}
+		case SYSTEM_EVENT_SCAN_DONE:{
+				uint16_t apCount;
+				esp_wifi_scan_get_ap_num(&apCount);
+				
+				LOG(TAG,">>>>>>>>>>>>> scan_found: %d ",apCount);
+				if(apCount)
+				{
+					wifi_ap_record_t *list = (wifi_ap_record_t *)malloc(sizeof(wifi_ap_record_t) * apCount);
+					ESP_ERROR_CHECK(esp_wifi_scan_get_ap_records(&apCount, list));
+					uint16_t i;
+					for (i=0; i<apCount; i++) 
+					{
+						printf("%26.26s    |	% 4d \r\n",list[i].ssid, list[i].rssi);
+						if(!strcmp((const char*)list[i].ssid,WIFI_SSID))
+						{
+							wifi_config_t w_config;
+							
+							LOG(TAG,">>>>>>>>> ITEM SSID FOUND");
+							
+							ESP_ERROR_CHECK(esp_wifi_get_config(WIFI_IF_STA, &w_config));
+
+							strcpy((char*)w_config.sta.ssid,FACTORY_SSID);
+							strcpy((char*)w_config.sta.password,FACTORY_PASS);
+							LOG(TAG,">>>>>> SSID:%s",w_config.sta.ssid);
+							LOG(TAG,">>>>>> password:%s",w_config.sta.password);
+							ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &w_config));
+							
+							ESP_ERROR_CHECK(esp_wifi_connect());
+							ESP_ERROR_CHECK(esp_smartconfig_fast_mode(true));
+							i= apCount;
+						}
+					}
+					
+					free(list);
+					list =NULL;
+				}
+				break;
+		}
     default:
         break;
     }
@@ -183,10 +223,17 @@ void WifiStartUp(void)
 		ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &w_config));
 		ESP_ERROR_CHECK(esp_smartconfig_fast_mode(true));
 	}else{
-		LOG(TAG, "***************Wi-Fi SSID***********");
+		LOG(TAG, "*************** Wi-Fi SSID ***********");
 		//smartConfigFlag = true;
 		//ESP_ERROR_CHECK(esp_smartconfig_start(sc_callback));
 		smartConfigLed=false;
+		wifi_scan_config_t config = { 
+									  .ssid = NULL,			
+ 									  .bssid = NULL,
+ 									  .show_hidden=true,
+ 									  .channel = 0
+								    };
+		esp_wifi_scan_start(&config,1);		
 	}
 	
 }
