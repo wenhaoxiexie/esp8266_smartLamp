@@ -70,6 +70,8 @@ void loopLed_control(bool sel,uint8_t wheelValue)
 
 	if(sel)
 	{
+		if(wheelValue>240)
+			wheelValue = 255;
 		ledNum = wheelValue/11;
 
 		for(uint8_t i=0;i<=ledNum;i++)
@@ -190,7 +192,7 @@ static void ledMangerProcess(DeviceVar_t* device,Commom_msg_t msg)
 	LIGHT_INFO_S lightInfo;
 	DeviceNotifyMsg event = DEVICE_NOTIFY_KEY_UNDEFINED;
 	
-	LOG(TAG,"ledMsg id:%d action:%d value:%d",msg.id,msg.action,msg.value);
+	//LOG(TAG,"ledMsg id:%d action:%d value:%d",msg.id,msg.action,msg.value);
 
 	switch (msg.action)
 	{		
@@ -305,9 +307,11 @@ static void ledMangerProcess(DeviceVar_t* device,Commom_msg_t msg)
 					#endif
 				}
 
-				LOG(TAG,">>>>>>> lamp_light: %d  led_old_light :%d",msg.value,led_old_light);
-				if(abs(msg.value-led_old_light)<200&&(led_loop_dir_f))
+				//LOG(TAG,">>>>>>> lamp_light: %d  led_old_light :%d led_loop_dir_f:%d led_dir_light:%d led_loop_dir:%d",
+				         			//msg.value,led_old_light,led_loop_dir_f,led_dir_light,led_loop_dir);
+				if(abs(msg.value-led_old_light)<100&&(led_loop_dir_f))
 				{
+					
 					if(msg.value>led_old_light)
 						led_loop_dir=1; // À≥ ±’Î
 					else 
@@ -333,7 +337,7 @@ static void ledMangerProcess(DeviceVar_t* device,Commom_msg_t msg)
 							led_loop_dir = 2;
 							led_dir_light = msg.value;	
 							break;
-						case 2:
+						case 2:							
 							if(msg.value<led_dir_light&&(abs(msg.value-led_dir_light)<100))
 								led_loop_dir_f = true;
 							else

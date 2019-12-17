@@ -12,8 +12,8 @@
 
 
 #define TAG		"WifiManager"
-#define FACTORY_SSID "wifitest4M"
-#define FACTORY_PASS "11111111"
+#define FACTORY_SSID "FACTORY_SL1501"
+#define FACTORY_PASS "12345678"
 #define WIFI_SSID	"MERCURY_30FF5E" 
 #define WIFI_PASS	"smart-home" 
 #define SMARTCONFIG_TIMEOUT_TICK   (60000 / portTICK_RATE_MS)
@@ -90,7 +90,7 @@ static esp_err_t wifiEvtHandlerCb(void* ctx, system_event_t* evt)
 					for (i=0; i<apCount; i++) 
 					{
 						printf("%26.26s    |	% 4d \r\n",list[i].ssid, list[i].rssi);
-						if(!strcmp((const char*)list[i].ssid,WIFI_SSID))
+						if(!strcmp((const char*)list[i].ssid,FACTORY_SSID))
 						{
 							wifi_config_t w_config;
 							

@@ -48,13 +48,12 @@ void touchbtnTask(void *para)
 		APT8S10GetWheelValue(&wheel_value);
 		if(0 != wheel_value)
 		{
-			usleep(50);
-			
 			if(0 != wheel_value)
 			{
-				LOG(TBT_TAG,"*******************2019-10-17 wheel(%d) *******************",wheel_value);
 				if(temp!=wheel_value)
+				{
 					LedCtrl(LED_LOCAL,LED_LIGHT_SET,wheel_value);	
+				}
 				temp = wheel_value;
 				wheel_value = 0;
 			}
