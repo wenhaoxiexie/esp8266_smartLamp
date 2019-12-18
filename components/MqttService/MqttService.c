@@ -407,7 +407,8 @@ static void ParseDirector(char* director)
 	// 解析查询
 	value = cJSON_GetObjectItem(payload_json, "check");
 	if(value != NULL){
-		FirstReportDevState(mqtt_client);		
+		ReportOnlineStatus(mqtt_client);
+		ReportDevCheck(mqtt_client);
 	}
 
 	// 解析灯光开关状态
